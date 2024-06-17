@@ -6,10 +6,8 @@ import org.springframework.data.repository.ListPagingAndSortingRepository;
 
 import com.examples.bobd.model.Company;
 
-//public interface CompanyRepository extends ListPagingAndSortingRepository<Company, Long> {
-import org.springframework.data.jpa.repository.JpaRepository;
+public interface CompanyRepository extends ListPagingAndSortingRepository<Company, Long> {
 
-interface EmployeeRepository extends JpaRepository<Company, Long> {	
 	List<Company> findAll();
 	Company getReferenceById(Long id);
 

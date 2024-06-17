@@ -7,6 +7,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE) 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Company {
 	
 	@Id
