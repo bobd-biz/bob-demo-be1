@@ -1,6 +1,5 @@
 package com.examples.bobd.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,7 +11,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 
 @Entity
 @Table(name = "companies", indexes = {
@@ -27,8 +25,6 @@ public class Company {
 	
 	@Id
 	@GeneratedValue
-	@NonFinal
-	private Long id;
-	@Column(name = "companyname")
+	Long id;
 	String companyName;
 }
