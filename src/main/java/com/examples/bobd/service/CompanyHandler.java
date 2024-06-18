@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.examples.bobd.model.Company;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -20,4 +21,8 @@ public class CompanyHandler {
 	  return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
       .body(BodyInserters.fromValue(response));
   }
+  
+//  public Flux<ServerResponse> findAll(ServerRequest request) {
+//	  
+//  }
 }
