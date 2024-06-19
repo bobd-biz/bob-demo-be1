@@ -2,6 +2,7 @@ package com.examples.bobd.model;
 
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
@@ -28,7 +29,10 @@ public class Customer {
 	
 	@Id
 	String id;
+	@Column(name = "firstname")
 	String firstName;
+	@Column(name = "lastname")
 	String lastName;
+	@Column(name = "companyname")
 	String companyName;
 }
