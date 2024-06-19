@@ -15,9 +15,11 @@ public class CompanyHandler {
 
   public Mono<ServerResponse> hello(ServerRequest request) {
       Company response = Company.builder()
+    		  .id(1L)
     		  .companyName("test company")
     		  .build();
-	  return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-      .body(BodyInserters.fromValue(response));
+	  return ServerResponse.ok()
+			  .contentType(MediaType.APPLICATION_JSON)
+			  .body(BodyInserters.fromValue(response));
   }
 }

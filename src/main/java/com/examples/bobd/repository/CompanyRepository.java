@@ -1,20 +1,14 @@
 package com.examples.bobd.repository;
 
-import java.util.List;
+import java.util.Optional;
 
-import org.springframework.data.repository.ListPagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.examples.bobd.model.Company;
 
-public interface CompanyRepository extends ListPagingAndSortingRepository<Company, Long> {
+public interface CompanyRepository extends ListCrudRepository<Company, Long>, CrudRepository<Company, Long>, PagingAndSortingRepository<Company, Long> {
 
-	List<Company> findAll();
-	Company getReferenceById(Long id);
-
-//	@Override
-//	Page<Company> findAll(Pageable pageable);
-//
-//	@Override
-//	List<Company> findAll(Sort sort);
-
+	Optional<Company> findByCompanyNameIgnoreCase(String companyName);
 }
