@@ -8,7 +8,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.examples.bobd.model.Company;
 
-public interface CompanyRepository extends ListCrudRepository<Company, Long>, CrudRepository<Company, Long>, PagingAndSortingRepository<Company, Long> {
+public interface CompanyRepository extends ListCrudRepository<Company, Long>, 
+				CrudRepository<Company, Long>, PagingAndSortingRepository<Company, Long> {
 
 	Optional<Company> findByCompanyNameIgnoreCase(String companyName);
 }

@@ -13,8 +13,8 @@ import com.examples.bobd.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Controller
-@RequiredArgsConstructor
+//@Controller
+//@RequiredArgsConstructor
 public class CompanyController {
 	
 //	private static final String JSON = MediaType.APPLICATION_JSON_VALUE;

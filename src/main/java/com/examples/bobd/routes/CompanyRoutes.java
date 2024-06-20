@@ -24,14 +24,13 @@ public class CompanyRoutes {
 //	  RouterFunction<ServerResponse> r2 = RouterFunctions.route()
 //			  .
 //	  
-//	  RouterFunction<ServerResponse> route = RouterFunctions.route().
-//			    .path(PREFIX, builder -> builder
-//			        .GET("/{id}", accept(MediaType.APPLICATION_JSON),
-//			        		handler.getReferenceById(request.bo))
-//			        .GET(accept(MediaType.APPLICATION_JSON), handler::listPeople)
-//			        .POST(handler::createPerson))
-//			    .build();
-	  return RouterFunctions
-			  .route(GET(PREFIX + "/hello").and(accept(MediaType.APPLICATION_JSON)), handler::hello);
+	  return RouterFunctions.route()
+			    .path(PREFIX, builder -> builder
+			        .GET("/{id}", accept(MediaType.APPLICATION_JSON), handler::getById)
+			        .GET(accept(MediaType.APPLICATION_JSON), handler::findAll)
+			        .POST(handler::create))
+			    .build();
+//	  return RouterFunctions
+//			  .route(GET(PREFIX + "/hello").and(accept(MediaType.APPLICATION_JSON)), handler::hello);
   }
 }

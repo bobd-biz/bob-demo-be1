@@ -1,5 +1,6 @@
 package com.examples.bobd.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -8,12 +9,23 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.examples.bobd.model.Company;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Component
+@RequiredArgsConstructor
 public class CompanyHandler {
 
-  public Mono<ServerResponse> hello(ServerRequest request) {
+	@Autowired
+	CompanyService service;
+	
+	public Mono<ServerResponse> findAll(ServerRequest request) {
+		return ServerResponse.ok()
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromValue(service.findAll()));
+	}
+	
+	public Mono<ServerResponse> hello(ServerRequest request) {
       Company response = Company.builder()
     		  .id(1L)
     		  .companyName("test company")
@@ -21,5 +33,38 @@ public class CompanyHandler {
 	  return ServerResponse.ok()
 			  .contentType(MediaType.APPLICATION_JSON)
 			  .body(BodyInserters.fromValue(response));
-  }
+	}
+	
+	public Mono<ServerResponse> getById(ServerRequest request) {
+		return service
+				.findById(Long.valueOf(request.pathVariable("id"))).map(company -> ServerResponse.ok()
+						.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(company)))
+				.orElse(ServerResponse.notFound().build());
+	}
+	
+	public Mono<ServerResponse> create(ServerRequest request) {
+        return request.bodyToMono(Company.class)
+                .flatMap(company -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(service.create(company))));
+    }
+	
+	public Mono<ServerResponse> update(ServerRequest request) {
+		        return request.bodyToMono(Company.class)
+                .flatMap(company -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(service.update(company))));
+	}
+	
+	public Mono<ServerResponse> delete(ServerRequest request) {
+		service.delete(Long.valueOf(request.pathVariable("id")));
+		return ServerResponse.ok().build();
+	}
+	
+	public Mono<ServerResponse> findByName(ServerRequest request) {
+		return service
+				.findByName(request.pathVariable("name")).map(company -> ServerResponse.ok()
+						.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(company)))
+				.orElse(ServerResponse.notFound().build());
+	}
 }
