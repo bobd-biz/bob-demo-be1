@@ -21,7 +21,7 @@ import lombok.experimental.NonFinal;
 @Value
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE) 
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @Builder
 public class Company {
 	

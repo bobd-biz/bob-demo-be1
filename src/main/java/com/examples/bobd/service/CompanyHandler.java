@@ -46,14 +46,16 @@ public class CompanyHandler {
         return request.bodyToMono(Company.class)
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(service.create(company))));
+                        .body(BodyInserters.fromValue(service.create(company))))
+                .switchIfEmpty(ServerResponse.badRequest().build());
     }
 	
 	public Mono<ServerResponse> update(ServerRequest request) {
 		        return request.bodyToMono(Company.class)
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(service.update(company))));
+                        .body(BodyInserters.fromValue(service.update(company))))
+                .switchIfEmpty(ServerResponse.notFound().build());
 	}
 	
 	public Mono<ServerResponse> delete(ServerRequest request) {

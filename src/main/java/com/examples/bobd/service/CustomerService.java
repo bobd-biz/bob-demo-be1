@@ -67,7 +67,11 @@ public class CustomerService {
 		return repo.findByLastNameIgnoreCase(lastName);
 	}
 	
-	public List<Customer> findByFirstNameAndLastName(String firstName, String lastName) {
-		return repo.findByFirstNameAndLastNameIgnoreCase(firstName, lastName);
+	public List<Customer> findByName(String firstName, String lastName) {
+		return repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName);
+	}
+
+	public List<Customer> findByCompanyName(String pathVariable) {
+		return repo.findByCompanyNameIgnoreCase(pathVariable);
 	}
 }

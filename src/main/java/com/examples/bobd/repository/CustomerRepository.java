@@ -14,5 +14,6 @@ public interface CustomerRepository extends ListPagingAndSortingRepository<Custo
 
 	  List<Customer> findByLastNameIgnoreCase(String lastName);
 	  List<Customer> findByFirstNameIgnoreCase(String firstName);
-	  List<Customer> findByFirstNameAndLastNameIgnoreCase(String firstName, String lastName);
+	  List<Customer> findByFirstNameOrLastNameIgnoreCase(String firstName, String lastName);
+	  List<Customer> findByCompanyNameIgnoreCase(String companyName);
 }

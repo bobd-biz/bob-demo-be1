@@ -53,6 +53,11 @@ public class CustomerHandler {
 		return ServerResponse.ok().build();
 	}
 	
+	public Mono<ServerResponse> findByCompanyName(ServerRequest request) {
+		List<Customer> customers = service.findByCompanyName(request.pathVariable("companyname"));
+		return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
+	}
+	
 	public Mono<ServerResponse> findByFirstName(ServerRequest request) {
 		List<Customer> customers = service.findByFirstName(request.pathVariable("firstname"));
 		return ServerResponse.ok()
@@ -66,10 +71,10 @@ public class CustomerHandler {
 
 	}
 	
-	public Mono<ServerResponse> findByFirstNameAndLastName(ServerRequest request) {
+	public Mono<ServerResponse> findByFirstNameOrLastName(ServerRequest request) {
 		String firstName = request.pathVariable("firstname");
 		String lastName = request.pathVariable("lastname");
-		List<Customer> customers = service.findByFirstNameAndLastName(firstName, lastName);
+		List<Customer> customers = service.findByName(firstName, lastName);
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
 	}
