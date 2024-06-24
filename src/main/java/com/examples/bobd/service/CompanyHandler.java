@@ -22,7 +22,7 @@ public class CompanyHandler {
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromValue(service.findAll()));
+				.body(BodyInserters.fromProducer(service.findAll(), Company.class));
 	}
 	
 	public Mono<ServerResponse> hello(ServerRequest request) {

@@ -9,15 +9,15 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.examples.bobd.service.CustomerHandler;
+import com.examples.bobd.service.CompanyHandler;
 
 @Configuration(proxyBeanMethods = false)
-public class CustomerRoutes {
+public class CompanyRoutes {
 	
-	private static final String PREFIX = "/customers";
+	private static final String PREFIX = "/companies";
 
-  @Bean//("customerRoutes")
-  public RouterFunction<ServerResponse> customerRoutesBean(CustomerHandler handler) {
+  @Bean//("companyRoutes")
+  public RouterFunction<ServerResponse> companyRoutesBean(CompanyHandler handler) {
 //	  Mono<String> string = request.body(BodyExtractors.toMono(String.class));BodyExtractors.
 //	  RouterFunction<ServerResponse> r2 = RouterFunctions.route()
 //			  .
@@ -25,7 +25,7 @@ public class CustomerRoutes {
 	  return RouterFunctions.route()
 			    .path(PREFIX, builder -> builder
 			        .GET("/all", handler::findAll)
-			        .GET("/{id}", handler::getById)
+			        .GET("/{id}", accept(MediaType.APPLICATION_JSON), handler::getById)
 //			        .GET(accept(MediaType.APPLICATION_JSON), handler::q)
 			        .POST(accept(MediaType.APPLICATION_JSON), handler::create)
 			        .PUT(accept(MediaType.APPLICATION_JSON), handler::update)
