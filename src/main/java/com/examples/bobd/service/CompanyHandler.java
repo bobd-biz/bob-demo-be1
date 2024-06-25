@@ -36,10 +36,11 @@ public class CompanyHandler {
 	}
 	
 	public Mono<ServerResponse> getById(ServerRequest request) {
-		return service
-				.findById(Long.valueOf(request.pathVariable("id"))).map(company -> ServerResponse.ok()
-						.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(company)))
-				.orElse(ServerResponse.notFound().build());
+		return service.findById(Long.valueOf(request.pathVariable("id")))
+				.flatMap(customer -> ServerResponse.ok()
+		                .contentType(MediaType.APPLICATION_JSON)
+		                .bodyValue(customer))
+		        .switchIfEmpty(ServerResponse.notFound().build());
 	}
 	
 	public Mono<ServerResponse> create(ServerRequest request) {
@@ -51,7 +52,7 @@ public class CompanyHandler {
     }
 	
 	public Mono<ServerResponse> update(ServerRequest request) {
-		        return request.bodyToMono(Company.class)
+        return request.bodyToMono(Company.class)
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromValue(service.update(company))))
@@ -64,9 +65,10 @@ public class CompanyHandler {
 	}
 	
 	public Mono<ServerResponse> findByName(ServerRequest request) {
-		return service
-				.findByName(request.pathVariable("name")).map(company -> ServerResponse.ok()
-						.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(company)))
-				.orElse(ServerResponse.notFound().build());
+		return service.findByName(request.pathVariable("name"))
+				.flatMap(customer -> ServerResponse.ok()
+		                .contentType(MediaType.APPLICATION_JSON)
+		                .bodyValue(customer))
+		        .switchIfEmpty(ServerResponse.notFound().build());
 	}
 }

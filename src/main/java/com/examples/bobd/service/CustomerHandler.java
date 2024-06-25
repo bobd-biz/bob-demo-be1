@@ -3,6 +3,7 @@ package com.examples.bobd.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -24,19 +25,20 @@ public class CustomerHandler {
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromValue(service.findAll()));
+				.body(BodyInserters.fromProducer(service.findAll(), Customer.class));
 	}
 	
 	public Mono<ServerResponse> getById(ServerRequest request) {
-		return service
-				.findById(String.valueOf(request.pathVariable("id"))).map(customer -> ServerResponse.ok()
-						.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customer)))
-				.orElse(ServerResponse.notFound().build());
+		return service.findById(String.valueOf(request.pathVariable("id")))
+			.flatMap(customer -> ServerResponse.ok()
+	                .contentType(MediaType.APPLICATION_JSON)
+	                .bodyValue(customer))
+	        .switchIfEmpty(ServerResponse.notFound().build());
 	}
 	
 	public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(Customer.class)
-                .flatMap(customer -> ServerResponse.ok()
+                .flatMap(customer -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromValue(service.create(customer))));
     }
@@ -68,7 +70,6 @@ public class CustomerHandler {
 		List<Customer> customers = service.findByLastName(request.pathVariable("lastname"));
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
-
 	}
 	
 	public Mono<ServerResponse> findByFirstNameOrLastName(ServerRequest request) {

@@ -16,22 +16,16 @@ public class CompanyRoutes {
 	
 	private static final String PREFIX = "/companies";
 
-  @Bean//("companyRoutes")
+  @Bean
   public RouterFunction<ServerResponse> companyRoutesBean(CompanyHandler handler) {
-//	  Mono<String> string = request.body(BodyExtractors.toMono(String.class));BodyExtractors.
-//	  RouterFunction<ServerResponse> r2 = RouterFunctions.route()
-//			  .
-//	  
 	  return RouterFunctions.route()
 			    .path(PREFIX, builder -> builder
-			        .GET("/all", handler::findAll)
+			        .GET(handler::findAll)
 			        .GET("/{id}", accept(MediaType.APPLICATION_JSON), handler::getById)
 //			        .GET(accept(MediaType.APPLICATION_JSON), handler::q)
 			        .POST(accept(MediaType.APPLICATION_JSON), handler::create)
 			        .PUT(accept(MediaType.APPLICATION_JSON), handler::update)
 			        .DELETE("/{id}", accept(MediaType.APPLICATION_JSON), handler::delete))
 			    .build();
-//	  return RouterFunctions
-//			  .route(GET(PREFIX + "/hello").and(accept(MediaType.APPLICATION_JSON)), handler::hello);
   }
 }

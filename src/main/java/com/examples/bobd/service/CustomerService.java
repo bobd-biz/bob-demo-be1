@@ -1,6 +1,5 @@
 package com.examples.bobd.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,12 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.examples.bobd.model.Customer;
-import com.examples.bobd.repository.CompanyRepository;
 import com.examples.bobd.repository.CustomerRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -25,25 +25,23 @@ public class CustomerService {
 	@Autowired
 	private final CustomerRepository repo;
 	
-	public Optional<Customer> findById(String id) {
-		return repo.findById(id);
+	public Mono<Customer> findById(String id) {
+		return Mono.justOrEmpty(repo.findById(id));
 	}
 	
-	public List<Customer> findAll() {
-		return Collections.emptyList();
-//		return repo.findAll().;
+	public Flux<Customer> findAll() {
+		return Flux.fromIterable(repo.findAll());
 	}
 	
-	public List<Customer> findAll(Pageable pageable) {
-		return repo.findAll(pageable).toList();
+	public Flux<Customer> findAll(Pageable pageable) {
+		return Flux.fromIterable(repo.findAll(pageable));
 	}
 
     public Customer create(Customer customer){
         return repo.save(customer);
     }
     
-	public Customer update(Customer customer) {
-
+	public Mono<Customer> update(Customer customer) {
 		return findById(customer.getId()).map(c -> {
 			Customer newcustomer = Customer.builder()
 					.id(c.getId())
@@ -52,7 +50,8 @@ public class CustomerService {
 					.companyName(customer.getCompanyName())
 					.build();
 			return repo.save(newcustomer);
-		}).orElseThrow(() -> new RuntimeException("Customer not found id=" + customer.getId()));
+		})
+		.switchIfEmpty(Mono.error(new RuntimeException("Update: Customer not found id=" + customer.getId())));
 	}
 	
 	public void delete(String id) {
