@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomerHandler {
 
-	CustomerService service;
+	private final CustomerService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		return ServerResponse.ok()

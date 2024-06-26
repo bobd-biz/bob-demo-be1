@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CompanyHandler {
 
-	CompanyService service;
+	private final CompanyService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		return ServerResponse.ok()
@@ -33,7 +33,7 @@ public class CompanyHandler {
 			  .body(BodyInserters.fromValue(response));
 	}
 	
-	public Mono<ServerResponse> getById(ServerRequest request) {
+	public Mono<ServerResponse> findById(ServerRequest request) {
 		return service.findById(Long.valueOf(request.pathVariable("id")))
 				.flatMap(customer -> ServerResponse.ok()
 		                .contentType(MediaType.APPLICATION_JSON)

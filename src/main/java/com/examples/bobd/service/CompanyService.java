@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 public class CompanyService {
 
-	CompanyRepository repo;
+	private final CompanyRepository repo;
 	
 	public Mono<Company> findById(Long id) {
 		return Mono.justOrEmpty(repo.findById(id));

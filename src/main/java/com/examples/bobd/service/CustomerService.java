@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomerService {
 
-	CustomerRepository repo;
+	private final CustomerRepository repo;
 	
 	public Mono<Customer> findById(String id) {
 		return Mono.justOrEmpty(repo.findById(id));
