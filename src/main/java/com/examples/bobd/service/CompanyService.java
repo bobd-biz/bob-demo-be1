@@ -1,6 +1,5 @@
 package com.examples.bobd.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -8,18 +7,15 @@ import com.examples.bobd.model.Company;
 import com.examples.bobd.repository.CompanyRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class CompanyService {
 
-	@Autowired
-	private final CompanyRepository repo;
+	CompanyRepository repo;
 	
 	public Mono<Company> findById(Long id) {
 		return Mono.justOrEmpty(repo.findById(id));

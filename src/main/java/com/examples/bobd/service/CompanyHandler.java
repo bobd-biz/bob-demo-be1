@@ -1,6 +1,5 @@
 package com.examples.bobd.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -16,7 +15,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CompanyHandler {
 
-	@Autowired
 	CompanyService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {

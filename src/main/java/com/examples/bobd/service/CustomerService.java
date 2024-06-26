@@ -1,29 +1,22 @@
 package com.examples.bobd.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.examples.bobd.model.Customer;
 import com.examples.bobd.repository.CustomerRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class CustomerService {
 
-	@Autowired
-	private final CustomerRepository repo;
+	CustomerRepository repo;
 	
 	public Mono<Customer> findById(String id) {
 		return Mono.justOrEmpty(repo.findById(id));
