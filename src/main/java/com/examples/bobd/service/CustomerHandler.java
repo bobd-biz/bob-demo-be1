@@ -36,7 +36,7 @@ public class CustomerHandler {
         return request.bodyToMono(Customer.class)
                 .flatMap(customer -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(service.create(customer))));
+                        .body(BodyInserters.fromValue(service.save(customer))));
     }
 	
 	public Mono<ServerResponse> update(ServerRequest request) {
