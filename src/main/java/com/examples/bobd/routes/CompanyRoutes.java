@@ -20,8 +20,8 @@ public class CompanyRoutes {
   public RouterFunction<ServerResponse> companyRoutesBean(CompanyHandler handler) {
 	  return RouterFunctions.route()
 			    .path(PREFIX, builder -> builder
-			        .GET(handler::findAll)
 			        .GET("/{id}", accept(MediaType.APPLICATION_JSON), handler::findById)
+			        .GET(handler::findAll)
 //			        .GET(accept(MediaType.APPLICATION_JSON), handler::q)
 			        .POST(accept(MediaType.APPLICATION_JSON), handler::create)
 			        .PUT(accept(MediaType.APPLICATION_JSON), handler::update)

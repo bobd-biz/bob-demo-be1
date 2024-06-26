@@ -9,31 +9,27 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import com.examples.bobd.model.Company;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class CompanyHandler {
 
 	private final CompanyService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
+		log.info("findAll request={}", request);
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromProducer(service.findAll(), Company.class));
 	}
 	
-	public Mono<ServerResponse> hello(ServerRequest request) {
-      Company response = Company.builder()
-    		  .id(1L)
-    		  .companyName("test company")
-    		  .build();
-	  return ServerResponse.ok()
-			  .contentType(MediaType.APPLICATION_JSON)
-			  .body(BodyInserters.fromValue(response));
-	}
-	
 	public Mono<ServerResponse> findById(ServerRequest request) {
+		log.info("findById request={}", request);
+		log.info("id={}", Long.valueOf(request.pathVariable("id")));
+		
 		return service.findById(Long.valueOf(request.pathVariable("id")))
 				.flatMap(customer -> ServerResponse.ok()
 		                .contentType(MediaType.APPLICATION_JSON)
