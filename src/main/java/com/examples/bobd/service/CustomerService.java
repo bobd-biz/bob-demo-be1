@@ -1,7 +1,5 @@
 package com.examples.bobd.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +9,7 @@ import com.examples.bobd.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +29,9 @@ public class CustomerService {
 		return Flux.fromIterable(repo.findAll(pageable));
 	}
 
-    public Customer create(Customer customer){
-        return repo.save(customer);
+    public Mono<Customer> create(Customer customer){
+		return Mono.fromCallable(() -> repo.save(customer))
+				.subscribeOn(Schedulers.boundedElastic());
     }
     
 	public Mono<Customer> update(Customer customer) {
@@ -51,19 +51,19 @@ public class CustomerService {
 		repo.deleteById(id);
 	}
 	
-	public List<Customer> findByFirstName(String firstName) {
-		return repo.findByFirstNameIgnoreCase(firstName);
+	public Flux<Customer> findByFirstName(String firstName) {
+		return Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName));
 	}
 	
-	public List<Customer> findByLastName(String lastName) {
-		return repo.findByLastNameIgnoreCase(lastName);
+	public Flux<Customer> findByLastName(String lastName) {
+		return Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName));
 	}
 	
-	public List<Customer> findByName(String firstName, String lastName) {
-		return repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName);
+	public Flux<Customer> findByName(String firstName, String lastName) {
+		return Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName));
 	}
 
-	public List<Customer> findByCompanyName(String pathVariable) {
-		return repo.findByCompanyNameIgnoreCase(pathVariable);
+	public Flux<Customer> findByCompanyName(String pathVariable) {
+		return Flux.fromIterable(repo.findByCompanyNameIgnoreCase(pathVariable));
 	}
 }

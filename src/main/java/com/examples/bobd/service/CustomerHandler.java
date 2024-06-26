@@ -1,7 +1,5 @@
 package com.examples.bobd.service;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -54,27 +52,31 @@ public class CustomerHandler {
 	}
 	
 	public Mono<ServerResponse> findByCompanyName(ServerRequest request) {
-		List<Customer> customers = service.findByCompanyName(request.pathVariable("companyname"));
-		return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
+		String name = request.queryParam("company").orElseThrow(() -> new RuntimeException("Company name is required"));
+		return ServerResponse.ok()
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromProducer(service.findByCompanyName(name), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByFirstName(ServerRequest request) {
-		List<Customer> customers = service.findByFirstName(request.pathVariable("firstname"));
+		String name = request.queryParam("first").orElseThrow(() -> new RuntimeException("First name is required"));
 		return ServerResponse.ok()
-				.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromProducer(service.findByFirstName(name), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByLastName(ServerRequest request) {
-		List<Customer> customers = service.findByLastName(request.pathVariable("lastname"));
+		String name = request.queryParam("last").orElseThrow(() -> new RuntimeException("Last name is required"));
 		return ServerResponse.ok()
-				.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromProducer(service.findByLastName(name), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByFirstNameOrLastName(ServerRequest request) {
-		String firstName = request.pathVariable("firstname");
-		String lastName = request.pathVariable("lastname");
-		List<Customer> customers = service.findByName(firstName, lastName);
+		String firstName = request.queryParam("first").orElseThrow(() -> new RuntimeException("First name is required"));
+		String lastName = request.queryParam("last").orElseThrow(() -> new RuntimeException("Last name is required"));
 		return ServerResponse.ok()
-				.contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(customers));
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromProducer(service.findByName(firstName, lastName), Customer.class));
 	}
 }
