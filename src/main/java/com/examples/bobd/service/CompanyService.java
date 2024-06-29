@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import com.examples.bobd.model.Company;
 import com.examples.bobd.repository.CompanyRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CompanyService {
 

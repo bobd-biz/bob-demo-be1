@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.examples.bobd.model.Customer;
 import com.examples.bobd.repository.CustomerRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class CustomerService {

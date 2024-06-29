@@ -60,6 +60,7 @@ public class CompanyHandler {
 	}
 	
 	public Mono<ServerResponse> findByName(ServerRequest request) {
+		log.info("findByName request={}", request);
 		return service.findByName(request.pathVariable("name"))
 				.flatMap(customer -> ServerResponse.ok()
 		                .contentType(MediaType.APPLICATION_JSON)
