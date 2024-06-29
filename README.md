@@ -50,7 +50,7 @@ To start serving the microservices (configured on port 3000):
 ## Design Considerations and Shortcomings
 
 * Services accept and return JSON.
-* No authentication and authorization are provided, so no HTTPS or OpenId/OAuth2.
+* To keep things simpler, authentication and authorization are not configured, so no HTTPS or OpenId/OAuth2.
 * The two different services (companies and customers) are packaged together for convenience.
 * Spring Webflux is used to implement the REST services in an attempt to provide asynchronous performance. However, no testing or analysis has been done to verify the services actually operate without blocking.
 * Error handling is by no means complete. For instance, if a resource is not found the service returns a 404 status code, but no detailed error details.
@@ -62,5 +62,11 @@ To start serving the microservices (configured on port 3000):
 * Although JPA is used, no work has been done with transactions (which aren't likely to be needed anyway for these services).
 * Spring Routes are used for service dispatch. Some of the services are only differentiated using query parameters, making the routing predicates a little clumsy. There may be a better approach.
 * The API is not versioned. In any event my preference is use headers instead of including version in the path.
-* Used Copilot to generate initial unit tests
+* Used Copilot to generate initial unit tests and suggest code patterns.
+* The overall approach to class definition takes a functional approach. Classes are idempotent - there are no setters.
+* With Webflux the class relationships are slightly different than traditional Spring projects. 
+    * *Repositories* deal directly with the database, and code is automatically generated from the repository interface. Unfortunately, Spring only supports reactive operations on NoSQL databases, so the SQL database operations are blocking.
+    * *Services* isolate business operations from the database implementation. This should make those operations easier to test. In addition, service operations use the reactive Mono/Flux model, although in the current implementation the database operations block. This might allow long duration operations to be chunked so that individual chunks block for a shorter time.
+    * *Handlers* both package operations that mirror the API as well as dealing with translation to and from the external representation. For instance, the handlers extract parameters from the server request and return status codes.
+    * *Routes* map the external URL requests into handler requests. The intent is to isolate all the server request and response operations into this layer (although not fully accomplished so far).
 

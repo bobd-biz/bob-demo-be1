@@ -71,5 +71,111 @@ public class CustomerServiceTest {
 	            .verifyComplete();
 	}
 	
-	// Add more tests for other methods in the CustomerService class
+	@Test
+	public void testUpdate() {
+		Customer customer = new Customer("test4", "First4", "Last4", "Test Company 4");
+		when(customerRepository.findById("test4")).thenReturn(Optional.of(customer));
+		when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+		StepVerifier.create(customerService.update(customer)).expectNextMatches(c -> c.getId().equals("test4"))
+				.verifyComplete();
+	}
+	
+	@Test
+	public void testUpdateNotFound() {
+        Customer customer =	new Customer("test5", "First5", "Last5", "Test Company 5");
+        when(customerRepository.findById("test5")).thenReturn(Optional.empty());
+        StepVerifier.create(customerService.update(customer))
+                .verifyErrorMessage("Update: Customer not found id=test5");
+	}
+	
+	@Test
+	public void testDelete() {
+		customerService.delete("test6");
+	}
+	
+	@Test
+	public void testFindByCompanyName() {
+		Customer customer = new Customer("test7", "First7", "Last7", "Test Company 7");
+		when(customerRepository.findByCompanyNameIgnoreCase("Test Company 7")).thenReturn(Arrays.asList(customer));
+
+		StepVerifier.create(customerService.findByCompanyName("Test Company 7"))
+				.expectNextMatches(c -> c.getId().equals("test7")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstName() {
+        Customer customer =	new Customer("test8", "First8", "Last8", "Test Company 8");
+        when(customerRepository.findByFirstNameIgnoreCase("First8")).thenReturn(Arrays.asList(customer));
+        StepVerifier.create(customerService.findByFirstName("First8"))
+                .expectNextMatches(c -> c.getId().equals("test8")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByLastName() {
+        Customer customer =	new Customer("test9", "First9", "Last9", "Test Company 9");
+        when(customerRepository.findByLastNameIgnoreCase("Last9")).thenReturn(Arrays.asList(customer));
+        StepVerifier.create(customerService.findByLastName("Last9"))
+                .expectNextMatches(c -> c.getId().equals("test9")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastName() {
+		Customer customer = new Customer("test10", "First10", "Last10", "Test Company 10");
+		when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First10", "Last10"))
+				.thenReturn(Arrays.asList(customer));
+		StepVerifier.create(customerService.findByName("First10", "Last10"))
+				.expectNextMatches(c -> c.getId().equals("test10")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameNotFound() {
+		when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First11", "Last11"))
+				.thenReturn(Arrays.asList());
+		StepVerifier.create(customerService.findByName("First11", "Last11")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameFirstNameOnly() {
+        Customer customer = new	Customer("test12", "First12", "Last12", "Test Company 12");
+        when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First12", "Last12"))
+                .thenReturn(Arrays.asList(customer));
+        StepVerifier.create(customerService.findByName("First12", "Last12"))
+                .expectNextMatches(c -> c.getId().equals("test12")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameLastNameOnly() {
+        Customer customer =	new Customer("test13", "First13", "Last13", "Test Company 13");
+        when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First13", "Last13"))
+                .thenReturn(Arrays.asList(customer));
+        StepVerifier.create(customerService.findByName("First13", "Last13"))
+                .expectNextMatches(c -> c.getId().equals("test13")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameMultiple() {
+        Customer customer1 = new Customer("test14", "First14", "Last14", "Test Company 14");
+        Customer customer2 = new Customer("test15", "First15", "Last15", "Test Company 15");
+        when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First14", "Last14"))
+                .thenReturn(Arrays.asList(customer1, customer2));
+        StepVerifier.create(customerService.findByName("First14", "Last14"))
+                .expectNextMatches(c -> c.getId().equals("test14"))
+                .expectNextMatches(c -> c.getId().equals("test15")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameMultipleNotFound() {
+		when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First16", "Last16")).thenReturn(Arrays.asList());
+		StepVerifier.create(customerService.findByName("First16", "Last16")).verifyComplete();
+	}
+	
+	@Test
+	public void testFindByFirstNameOrLastNameMultipleFirstNameOnly() {
+		Customer customer = new Customer("test17", "First17", "Last17", "Test Company 17");
+		when(customerRepository.findByFirstNameOrLastNameIgnoreCase("First17", "Last17"))
+				.thenReturn(Arrays.asList(customer));
+		StepVerifier.create(customerService.findByName("First17", "Last17"))
+				.expectNextMatches(c -> c.getId().equals("test17")).verifyComplete();
+	}
 }

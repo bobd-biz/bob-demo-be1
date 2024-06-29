@@ -7,11 +7,13 @@ import com.examples.bobd.model.Customer;
 import com.examples.bobd.repository.CustomerRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerService {
 
@@ -35,14 +37,18 @@ public class CustomerService {
     }
     
 	public Mono<Customer> update(Customer customer) {
-		return findById(customer.getId()).map(c -> {
-			Customer newcustomer = Customer.builder()
-					.id(c.getId())
-					.firstName(customer.getFirstName())
-					.lastName(customer.getLastName())
-					.companyName(customer.getCompanyName())
-					.build();
-			return repo.save(newcustomer);
+		log.info("Update: Customer id={}", customer);
+		return findById(customer.getId())
+			.log("Update: Customer found id=" + customer.getId())
+			.map(found -> {
+				Customer newcustomer = Customer.builder()
+						.id(found.getId())
+						.firstName(customer.getFirstName())
+						.lastName(customer.getLastName())
+						.companyName(customer.getCompanyName())
+						.build();
+				log.info("Update: Customer updated id={}", newcustomer);
+				return repo.save(newcustomer);
 		})
 		.switchIfEmpty(Mono.error(new RuntimeException("Update: Customer not found id=" + customer.getId())));
 	}

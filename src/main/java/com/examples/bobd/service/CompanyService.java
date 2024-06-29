@@ -29,7 +29,7 @@ public class CompanyService {
 		return Flux.fromIterable(repo.findAll(pageable));
 	}
 
-	public Mono<Company> create(Company company){
+	public Mono<Company> save(Company company){
 		return Mono.fromCallable(() -> repo.save(company))
 				.subscribeOn(Schedulers.boundedElastic());
 	}

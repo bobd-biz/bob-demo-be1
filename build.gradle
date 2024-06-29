@@ -38,8 +38,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-mysql'
-//	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
-//	implementation 'org.springdoc:springdoc-openapi-starter-webflux-api'
+	// Note the springdoc library include needs a version number to compile correctly
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-api:2.5.0'
 	
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -48,10 +48,11 @@ dependencies {
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
+//	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'}
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
 
 tasks.named('test') {
 	outputs.dir snippetsDir

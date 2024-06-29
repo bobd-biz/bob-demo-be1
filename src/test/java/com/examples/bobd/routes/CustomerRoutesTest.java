@@ -1,4 +1,4 @@
-package com.examples.bobd.service;
+package com.examples.bobd.routes;
 
 import static org.mockito.Mockito.when;
 
@@ -13,13 +13,17 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.examples.bobd.model.Customer;
 import com.examples.bobd.routes.CustomerRoutes;
+import com.examples.bobd.service.CustomerHandler;
+import com.examples.bobd.service.CustomerService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class CustomerHandlerTest {
+public class CustomerRoutesTest {
 
-    @Mock
+    private static final String PREFIX = "/customers";
+    
+	@Mock
     private CustomerService customerService;
 
     @InjectMocks
@@ -42,11 +46,12 @@ public class CustomerHandlerTest {
         Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
         when(customerService.findAll()).thenReturn(Flux.just(customer1, customer2));
 
-        webTestClient.get().uri("/customers")
+        webTestClient.get().uri(PREFIX)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class);
+                .expectBodyList(Customer.class)
+                .hasSize(2);
     }
 
     @Test
@@ -54,7 +59,7 @@ public class CustomerHandlerTest {
         Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
         when(customerService.findById("test1")).thenReturn(Mono.just(customer));
 
-        webTestClient.get().uri("/customers/test1")
+        webTestClient.get().uri(PREFIX + "/test1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -65,12 +70,20 @@ public class CustomerHandlerTest {
     @Disabled
 	public void testCreateCustomer() {
 		Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
+		Customer updatedCustomer = new Customer("test1", "First1A", "Last1A", "Test Company 1");
+		when(customerService.findById("test1")).thenReturn(Mono.just(customer));
 		when(customerService.save(customer)).thenReturn(Mono.just(customer));
 
-		webTestClient.post().uri("/customers").contentType(MediaType.APPLICATION_JSON)
-				.body(Mono.just(customer), Customer.class).exchange()
-				.expectStatus().isCreated()
-				.expectBody(Customer.class);
+		try {
+			webTestClient.post().uri(PREFIX).contentType(MediaType.APPLICATION_JSON)
+					.body(Mono.just(customer), Customer.class).exchange()
+					.expectStatus().isCreated()
+					.expectBody(Customer.class)
+					.isEqualTo(updatedCustomer);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
     
 	@Test
@@ -78,7 +91,7 @@ public class CustomerHandlerTest {
 		Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
 		when(customerService.update(customer)).thenReturn(Mono.just(customer));
 
-		webTestClient.put().uri("/customers").contentType(MediaType.APPLICATION_JSON)
+		webTestClient.put().uri(PREFIX).contentType(MediaType.APPLICATION_JSON)
 				.body(Mono.just(customer), Customer.class)
 				.exchange()
 				.expectStatus().isOk()
@@ -87,8 +100,9 @@ public class CustomerHandlerTest {
 
 	@Test
 	public void testDeleteCustomer() {
-		webTestClient.delete().uri("/customers/test1").exchange()
-		.expectStatus().isOk();
+		webTestClient.delete().uri(PREFIX + "/test1")
+			.exchange()
+			.expectStatus().isOk();
 	}
 
 	@Test
@@ -98,10 +112,11 @@ public class CustomerHandlerTest {
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
 		when(customerService.findByCompanyName("Test Company 1")).thenReturn(Flux.just(customer1));
 
-		webTestClient.get().uri("/customers?company=Test%20Company 1").accept(MediaType.APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
-				.expectBody(Customer.class);
+		webTestClient.get().uri(PREFIX + "?company=Test%20Company%201")
+			.accept(MediaType.APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(Customer.class);
 	}
 	
 	@Test
@@ -109,7 +124,8 @@ public class CustomerHandlerTest {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		when(customerService.findByFirstName("First1")).thenReturn(Flux.just(customer1));
 
-		webTestClient.get().uri("/customers?first=First1").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "?first=First1")
+				.accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isOk()
 				.expectBodyList(Customer.class);
 	}
@@ -119,9 +135,10 @@ public class CustomerHandlerTest {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		when(customerService.findByLastName("Last1")).thenReturn(Flux.just(customer1));
 
-		webTestClient.get().uri("/customers?last=Last1").accept(MediaType.APPLICATION_JSON).exchange()
-				.expectStatus().isOk()
-				.expectBodyList(Customer.class);
+		webTestClient.get().uri(PREFIX + "?last=Last1")
+			.accept(MediaType.APPLICATION_JSON).exchange()
+			.expectStatus().isOk()
+			.expectBodyList(Customer.class);
 	}
 	
 	@Test
@@ -129,7 +146,7 @@ public class CustomerHandlerTest {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1));
 
-		webTestClient.get().uri("/customers?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
+		webTestClient.get().uri(PREFIX + "?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isOk()
 				.expectBodyList(Customer.class);
@@ -140,30 +157,36 @@ public class CustomerHandlerTest {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1));
 
-		webTestClient.get().uri("/customers?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
+		webTestClient.get().uri(PREFIX + "?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
+				.exchange().expectStatus().isOk()
 				.expectBodyList(Customer.class);
 	}
 	
 	@Test
 	@Disabled
 	public void testFindByFirstNameOrLastNameNotFound() {
-		webTestClient.get().uri("/customers?first=First1").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "?first=First1").accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isNotFound();
 	}
+	
+	@Test
+	@Disabled
+	public void testFindByFirstNameOrLastNameEmpty() {
+		webTestClient.get().uri(PREFIX + "?name").accept(MediaType.APPLICATION_JSON).exchange()
+			.expectStatus()
+			.isNotFound();
+	}	
 	
 	@Test
 	@Disabled
 	public void testFindByFirstNameOrLastNameEmptyLastName() {
-		webTestClient.get().uri("/customers?first=First1&last=").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "?first=First1&last=").accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isNotFound();
 	}
 	
 	@Test
-	@Disabled
 	public void testFindByFirstNameOrLastNameEmptyFirstName() {
-		webTestClient.get().uri("/customers?first=&last=Last1").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "t?first=&last=Last1").accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isNotFound();
 	}
 	
@@ -173,10 +196,20 @@ public class CustomerHandlerTest {
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
 		when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1, customer2));
 
-		webTestClient.get().uri("/customers?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
-				.expectBodyList(Customer.class);
+		webTestClient.get().uri(PREFIX + "?first=First1&last=Last1").accept(MediaType.APPLICATION_JSON)
+				.exchange().expectStatus().isOk()
+				.expectBodyList(Customer.class).hasSize(2);
+	}
+	
+	@Test
+	@Disabled
+	public void testFindByFirstNameOrLastNameMultipleEmpty() {
+        Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
+        Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
+        when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1, customer2));
+        
+        webTestClient.get().uri(PREFIX).accept(MediaType.APPLICATION_JSON).exchange()
+                .expectStatus().isNotFound();
 	}
 	
 	@Test
@@ -186,7 +219,7 @@ public class CustomerHandlerTest {
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
 		when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1, customer2));
 
-		webTestClient.get().uri("/customers?first=First1&last=").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "?first=First1&last=").accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isNotFound();
 	}
 	
@@ -197,7 +230,7 @@ public class CustomerHandlerTest {
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
 		when(customerService.findByName("First1", "Last1")).thenReturn(Flux.just(customer1, customer2));
 
-		webTestClient.get().uri("/customers?first=&last=Last1").accept(MediaType.APPLICATION_JSON).exchange()
+		webTestClient.get().uri(PREFIX + "?first=&last=Last1").accept(MediaType.APPLICATION_JSON).exchange()
 				.expectStatus().isNotFound();
 	}
 	

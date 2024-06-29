@@ -21,9 +21,10 @@ public class CompanyHandler {
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		log.info("findAll request={}", request);
-		return ServerResponse.ok()
+		var response = ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromProducer(service.findAll(), Company.class));
+		return response;
 	}
 	
 	public Mono<ServerResponse> findById(ServerRequest request) {
@@ -41,7 +42,7 @@ public class CompanyHandler {
         return request.bodyToMono(Company.class)
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(service.create(company))))
+                        .body(BodyInserters.fromProducer(service.save(company), Company.class)))
                 .switchIfEmpty(ServerResponse.badRequest().build());
     }
 	
@@ -49,8 +50,8 @@ public class CompanyHandler {
         return request.bodyToMono(Company.class)
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(service.update(company))))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                        .body(BodyInserters.fromProducer(service.update(company), Company.class))
+                .switchIfEmpty(ServerResponse.notFound().build()));
 	}
 	
 	public Mono<ServerResponse> delete(ServerRequest request) {
