@@ -42,7 +42,10 @@ public class CustomerHandler {
 	}
 	
 	public Mono<ServerResponse> create(ServerRequest request) {
+//		request.bodyToMono(Customer.class).subscribe(cust -> log.info("Create: Customer {}", cust));
+		log.info("Create: Customer {}", request);
         return request.bodyToMono(Customer.class)
+        		.onErrorResume(e -> Mono.error(new RuntimeException("Error: " + e.getMessage())))
                 .flatMap(customer -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromProducer(service.save(Customer.builder()

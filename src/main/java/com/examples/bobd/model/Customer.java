@@ -2,6 +2,8 @@ package com.examples.bobd.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -14,23 +16,25 @@ import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(name = "customers", indexes = {
-		@Index(columnList = "firstName"),
-		@Index(columnList = "lastName"),
-		@Index(columnList = "companyName")
+		@Index(columnList = "firstname"),
+		@Index(columnList = "lastname"),
+		@Index(columnList = "companyname")
 })
 @Value
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE) 
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 public class Customer {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id", length = 36)
 	String id;
-	@Column(name = "firstname")
+	@Column(name = "firstname",	length = 50)
 	String firstName;
-	@Column(name = "lastname")
+	@Column(name = "lastname", length = 50)
 	String lastName;
-	@Column(name = "companyname")
+	@Column(name = "companyname", length = 50)
 	String companyName;
 }

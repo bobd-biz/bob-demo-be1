@@ -1,5 +1,6 @@
 package com.examples.bobd.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +11,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.examples.bobd.model.Customer;
+import com.examples.bobd.repository.CustomerRepository;
 import com.examples.bobd.routes.CustomerRoutes;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +27,7 @@ public class CustomerHandlerTest {
 
     @Mock
     private CustomerService customerService;
-
+    
     @InjectMocks
     private CustomerHandler customerHandler;
     
@@ -32,10 +38,39 @@ public class CustomerHandlerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+//        customerService = new CustomerService(customerRepository);
         customerRoutes = new CustomerRoutes();
         webTestClient = WebTestClient.bindToRouterFunction(customerRoutes.customerRoutesBean(customerHandler)).build();
     }
-
+    
+    @Test
+    public void testCustomerExtractionFromBody() throws JsonProcessingException {
+        Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
+        String customerString = new ObjectMapper().writeValueAsString(customer);
+        when(customerService.save(null)).thenReturn(Mono.just(customer));
+        
+        ObjectMapper mapper = new ObjectMapper();
+        var s = "{\"lastName\": \"Last3\", \"companyName\": \"Test Company 2\", \"firstName\": \"First3\", \"id\": \"\"}";
+        var decoded = mapper.readValue(s, Customer.class);
+        System.out.println(mapper.writeValueAsString(decoded));
+        
+//        var response = webTestClient.post().uri("/customers")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(customerString)
+//                .retrieve()
+//                .bodyToMono(String.class);
+//        
+//        WebClient webClient = WebClient.create();
+//        var responseJson = webClient.get()
+//                                       .uri("https://petstore.swagger.io/v2/pet/findByStatus?status=available")
+//                                       .retrieve()
+//                                       .bodyToMono(String.class);
+//        response
+//                .expectStatus().isCreated()
+//                .expectBody(String.class)
+//                .isEqualTo(customerString);
+    }
+    
     @Test
     public void testFindAllCustomers() {
         Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");

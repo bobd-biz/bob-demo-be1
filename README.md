@@ -64,6 +64,8 @@ To start serving the microservices (configured on port 3000):
 * The API is not versioned. In any event my preference is use headers instead of including version in the path.
 * Used Copilot to generate initial unit tests and suggest code patterns.
 * The overall approach to class definition takes a functional approach. Classes are idempotent - there are no setters.
+* Given the simple data structures, DAO/DTO classes and Mapstruct were not used.
+* A foreign key could be used for the many-one relationship from the customers table to the companies table. For now a NoSQL approach was used, just embedding the company name in the customers table.
 * With Webflux the class relationships are slightly different than traditional Spring projects. 
     * *Repositories* deal directly with the database, and code is automatically generated from the repository interface. Unfortunately, Spring only supports reactive operations on NoSQL databases, so the SQL database operations are blocking.
     * *Services* isolate business operations from the database implementation. This should make those operations easier to test. In addition, service operations use the reactive Mono/Flux model, although in the current implementation the database operations block. This might allow long duration operations to be chunked so that individual chunks block for a shorter time.

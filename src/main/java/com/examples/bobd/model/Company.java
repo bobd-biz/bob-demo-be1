@@ -1,5 +1,7 @@
 package com.examples.bobd.model;
 
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +18,7 @@ import lombok.experimental.NonFinal;
 
 @Entity
 @Table(name = "companies", indexes = {
-		@Index(columnList = "companyName")
+		@Index(columnList = "companyname")
 })
 @Value
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE) 
@@ -26,9 +28,9 @@ import lombok.experimental.NonFinal;
 public class Company {
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = SEQUENCE)
 	@NonFinal
 	private Long id;
-	@Column(name = "companyname")
+	@Column(name = "companyname", length = 50, unique=true,  nullable = false)
 	String companyName;
 }
