@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CompanyHandler {
 
+	private static final String COMPANY_NAME = "name";
+	
 	private final CompanyService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
@@ -35,7 +37,7 @@ public class CompanyHandler {
 				.flatMap(customer -> ServerResponse.ok()
 		                .contentType(MediaType.APPLICATION_JSON)
 		                .bodyValue(customer))
-		        .switchIfEmpty(ServerResponse.notFound().build());
+		        .switchIfEmpty(Responses.notFound("Company not found"));
 	}
 	
 	public Mono<ServerResponse> create(ServerRequest request) {
@@ -43,7 +45,7 @@ public class CompanyHandler {
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromProducer(service.save(company), Company.class)))
-                .switchIfEmpty(ServerResponse.badRequest().build());
+                .switchIfEmpty(Responses.badRequest("Company not found"));
     }
 	
 	public Mono<ServerResponse> update(ServerRequest request) {
@@ -51,7 +53,7 @@ public class CompanyHandler {
                 .flatMap(company -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromProducer(service.update(company), Company.class))
-                .switchIfEmpty(ServerResponse.notFound().build()));
+                .switchIfEmpty(Responses.notFound("Company not updated")));
 	}
 	
 	public Mono<ServerResponse> delete(ServerRequest request) {
@@ -61,10 +63,15 @@ public class CompanyHandler {
 	
 	public Mono<ServerResponse> findByName(ServerRequest request) {
 		log.info("findByName request={}", request);
-		return service.findByName(request.pathVariable("name"))
+		String name = request.queryParam(COMPANY_NAME).orElseThrow(() -> new RuntimeException("Company name is required"));
+		return service.findByName(name)
 				.flatMap(customer -> ServerResponse.ok()
 		                .contentType(MediaType.APPLICATION_JSON)
 		                .bodyValue(customer))
-		        .switchIfEmpty(ServerResponse.notFound().build());
+		        .switchIfEmpty(Responses.badRequest("Company not found"));
 	}
+	
+//	private void foobar() {
+//		Pageable pageable = PageRequest.of(0, 10, Sort.by("companyname").ascending());	
+//	}
 }

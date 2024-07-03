@@ -71,4 +71,5 @@ To start serving the microservices (configured on port 3000):
     * *Services* isolate business operations from the database implementation. This should make those operations easier to test. In addition, service operations use the reactive Mono/Flux model, although in the current implementation the database operations block. This might allow long duration operations to be chunked so that individual chunks block for a shorter time.
     * *Handlers* both package operations that mirror the API as well as dealing with translation to and from the external representation. For instance, the handlers extract parameters from the server request and return status codes.
     * *Routes* map the external URL requests into handler requests. The intent is to isolate all the server request and response operations into this layer (although not fully accomplished so far).
+* Error handling is rudimentary at best. JSON format errors (converting a JSON string to an internal object like Customer), incorrect parameters and not found (404) errors return a simple JSON error message.
 

@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.examples.bobd.model.Customer;
-import com.examples.bobd.routes.CustomerRoutes;
 import com.examples.bobd.service.CustomerHandler;
 import com.examples.bobd.service.CustomerService;
 
@@ -110,7 +109,7 @@ public class CustomerRoutesTest {
 	public void testFindByCompanyName() {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
-		when(customerService.findByCompanyName("Test Company 1")).thenReturn(Flux.just(customer1));
+		when(customerService.findByCompanyName("Test Company 1")).thenReturn(Flux.just(customer1, customer2));
 
 		webTestClient.get().uri(PREFIX + "?company=Test%20Company%201")
 			.accept(MediaType.APPLICATION_JSON)

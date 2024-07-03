@@ -1,6 +1,5 @@
 package com.examples.bobd.service;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,13 +10,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.examples.bobd.model.Customer;
-import com.examples.bobd.repository.CustomerRepository;
 import com.examples.bobd.routes.CustomerRoutes;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Flux;
@@ -28,6 +25,9 @@ public class CustomerHandlerTest {
     @Mock
     private CustomerService customerService;
     
+    private final ObjectMapper mapper = new ObjectMapper()
+  		  .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     @InjectMocks
     private CustomerHandler customerHandler;
     
@@ -46,13 +46,51 @@ public class CustomerHandlerTest {
     @Test
     public void testCustomerExtractionFromBody() throws JsonProcessingException {
         Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
-        String customerString = new ObjectMapper().writeValueAsString(customer);
+        String customerString = mapper.writeValueAsString(customer);
         when(customerService.save(null)).thenReturn(Mono.just(customer));
         
-        ObjectMapper mapper = new ObjectMapper();
-        var s = "{\"lastName\": \"Last3\", \"companyName\": \"Test Company 2\", \"firstName\": \"First3\", \"id\": \"\"}";
+        var s = 
+        		"""
+        		{"lastName": "Last3", "companyName": "Test Company 2", "firstName": "First3"}
+        		
+        		""";
         var decoded = mapper.readValue(s, Customer.class);
         System.out.println(mapper.writeValueAsString(decoded));
+        
+		var valid = Mono.just(s)
+			.map(str -> {
+				try {
+					return mapper.readValue(str, Customer.class);
+				} catch (JsonProcessingException e) {
+					return null;
+				}
+			});
+		
+		System.out.println("valid");
+		valid.subscribe(System.out::println);
+		
+		var invalid = Mono.just("invalid")
+			.map(str -> {
+				try {
+					return mapper.readValue(str, Customer.class);
+				} catch (JsonProcessingException e) {
+					return Mono.error(e);
+				}
+			});
+		
+		System.out.println("invalid");
+		invalid.subscribe(System.out::println);
+		
+		var ErrorResponse = Mono.just("invalid").map(str -> {
+			try {
+				return mapper.readValue(str, Customer.class);
+			} catch (JsonProcessingException e) {
+				return null;
+			}
+		}).onErrorReturn(new Customer("error", "error", "error", "error"));
+		
+		System.out.println("ErrorResponse");
+		ErrorResponse.subscribe(System.out::println);
         
 //        var response = webTestClient.post().uri("/customers")
 //                .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +169,7 @@ public class CustomerHandlerTest {
 	public void testFindByCompanyName() {
 		Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
 		Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
-		when(customerService.findByCompanyName("Test Company 1")).thenReturn(Flux.just(customer1));
+		when(customerService.findByCompanyName("Test Company 1")).thenReturn(Flux.just(customer1, customer2));
 
 		webTestClient.get().uri("/customers?company=Test%20Company 1").accept(MediaType.APPLICATION_JSON)
 				.exchange()

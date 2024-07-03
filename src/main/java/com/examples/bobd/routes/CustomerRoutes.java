@@ -29,7 +29,7 @@ public class CustomerRoutes {
 	  return RouterFunctions.route()
 			    .path(PREFIX, builder -> builder
 		    		.before(request -> {
-		    			log.info(request.method() + " " + request.path());
+		    			log.info("Customers {} {}", request.method(), request.path());
 		    			return request;
 		    		})
 			        .GET(ID, handler::getById)
