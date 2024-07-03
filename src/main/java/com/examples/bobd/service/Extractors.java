@@ -42,11 +42,22 @@ public class Extractors {
 		return Optional.empty();
 	}
 	
+	public static Optional<Sort> extractSort(ServerRequest request) {
+		return extractSort(request, Set.of());
+	}
+	
 	public static Optional<Sort> extractSort(ServerRequest request, Set<String> validFields) {
 		Optional<List<String>> sort = extractStringsParam(request, SORT_BY);
 		Optional<String> dir = extractStringParam(request, SORT_DIR);
+		System.out.println("sort: " + sort);
 		
 		// validate sort fields
+		if (sort.isPresent() && !sort.get().stream()
+				.filter(field -> field != null)
+				.map(field -> field.toLowerCase())
+				.allMatch(validFields::contains)) {
+			throw new IllegalArgumentException("Invalid sort field");
+		}
 		
 		if (sort.isPresent() || dir.isPresent()) {
 			return Optional.of(Sort.by(Sort.Direction.fromString(dir.orElse("asc")), 

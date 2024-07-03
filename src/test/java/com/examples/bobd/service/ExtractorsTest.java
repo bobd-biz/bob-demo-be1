@@ -2,9 +2,11 @@ package com.examples.bobd.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,24 @@ public class ExtractorsTest {
     @Test
     public void testExtractSort() {
         Sort expectedSort = Sort.by(Sort.Direction.ASC, "field1", "field2");
-        assertEquals(expectedSort, Extractors.extractSort(serverRequest, null).orElse(null));
+        assertEquals(expectedSort, Extractors.extractSort(serverRequest, Set.of("field1", "field2")).orElse(null));
+    }
+
+    @Test()
+    public void testExtractSort_unknown_sort_field() {
+        Sort expectedSort = Sort.by(Sort.Direction.ASC, "field1", "field2");
+        assertThrows(IllegalArgumentException.class, () -> Extractors.extractSort(serverRequest, Set.of("field1")).orElse(null));
+    }
+
+    @Test
+    public void testExtractSort_no_sort_fields() {
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("dir", "asc");
+        queryParams.add("sort", null);
+
+        serverRequest = MockServerRequest.builder().queryParams(queryParams).build();
+        
+        Sort expectedSort = Sort.by(Sort.Direction.ASC, "bogus");
+        assertThrows(IllegalArgumentException.class, () -> Extractors.extractSort(serverRequest, Set.of("bogus")).orElse(null));
     }
 }
