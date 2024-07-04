@@ -36,6 +36,7 @@ public class CompanyRoutes {
 			        .GET("/{id}", accept(MediaType.APPLICATION_JSON), handler::findById)
 			        .GET(hasNameParam().and(accept(MediaType.APPLICATION_JSON)), handler::findByName)
 			        .GET(accept(MediaType.APPLICATION_JSON), handler::findAll)
+			        
 			        .POST(accept(MediaType.APPLICATION_JSON), handler::create)
 			        .PUT(accept(MediaType.APPLICATION_JSON), handler::update)
 			        .DELETE("/{id}", accept(MediaType.APPLICATION_JSON), handler::delete))
