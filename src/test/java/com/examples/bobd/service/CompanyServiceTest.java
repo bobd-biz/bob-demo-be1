@@ -14,7 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.examples.bobd.model.Company;
 import com.examples.bobd.repository.CompanyRepository;
@@ -114,9 +116,11 @@ public class CompanyServiceTest {
 	public void testFindAllPageable() {
         Company company1 = new Company(1L, "Test Company 1");
         Company company2 = new Company(2L, "Test Company 2");
-        when(companyRepository.findAll(PageRequest.of(0, 10))).thenReturn(new PageImpl<>(Arrays.asList(company1, company2)));
-
-        StepVerifier.create(companyService.findAll(PageRequest.of(0, 10)))
+		Optional<Pageable> pageRequest0_10 = Optional.of(PageRequest.of(0, 10));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_10.get())).thenReturn(new PageImpl<>(Arrays.asList(company1, company2)));
+		
+        StepVerifier.create(companyService.findAll(pageRequest0_10, sort))
                 .expectNextMatches(c -> c.getId().equals(1L))
                 .expectNextMatches(c -> c.getId().equals(2L))
                 .verifyComplete();
@@ -124,18 +128,23 @@ public class CompanyServiceTest {
 	
 	@Test
 	public void testFindAllPageableEmpty() {
-		when(companyRepository.findAll(PageRequest.of(0, 10))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		Optional<Pageable> pageRequest0_10 = Optional.of(PageRequest.of(0, 10));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_10.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 10))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest0_10, sort))
+				.verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableOne() {
 		Company company = new Company(1L, "Test Company 1");
-		when(companyRepository.findAll(PageRequest.of(0, 10)))
+		Optional<Pageable> pageRequest0_10 = Optional.of(PageRequest.of(0, 10));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_10.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 10))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_10, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
 	}
 	
@@ -143,140 +152,178 @@ public class CompanyServiceTest {
 	public void testFindAllPageableTwoPages() {
 		Company company1 = new Company(1L, "Test Company 1");
 		Company company2 = new Company(2L, "Test Company 2");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1)))
+		when(companyRepository.findAll(pageRequest1_1.get()))
+				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
+		when(companyRepository.findAll(pageRequest0_1.get()))
+				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
+		when(companyRepository.findAll(pageRequest1_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).expectNextMatches(c -> c.getId().equals(2L))
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).expectNextMatches(c -> c.getId().equals(2L))
 				.verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesEmpty() {
-		when(companyRepository.findAll(PageRequest.of(0, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesOne() {
 		Company company = new Company(1L, "Test Company 1");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company)));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwo() {
 		Company company1 = new Company(1L, "Test Company 1");
 		Company company2 = new Company(2L, "Test Company 2");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1)))
+		when(companyRepository.findAll(pageRequest1_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).expectNextMatches(c -> c.getId().equals(2L))
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).expectNextMatches(c -> c.getId().equals(2L))
 				.verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoEmpty() {
-		when(companyRepository.findAll(PageRequest.of(0, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesOneEmpty() {
 		Company company = new Company(1L, "Test Company 1");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company)));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoOne() {
 		Company company1 = new Company(1L, "Test Company 1");
 		Company company2 = new Company(2L, "Test Company 2");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1)))
+		when(companyRepository.findAll(pageRequest1_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).expectNextMatches(c -> c.getId().equals(2L))
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).expectNextMatches(c -> c.getId().equals(2L))
 				.verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoOneEmpty() {
 		Company company1 = new Company(1L, "Test Company 1");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoOneTwo() {
 		Company company1 = new Company(1L, "Test Company 1");
 		Company company2 = new Company(2L, "Test Company 2");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1)))
+		when(companyRepository.findAll(pageRequest1_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).expectNextMatches(c -> c.getId().equals(2L))
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).expectNextMatches(c -> c.getId().equals(2L))
 				.verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoOneTwoEmpty() {
 		Company company1 = new Company(1L, "Test Company 1");
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
 		when(companyRepository.findAll(PageRequest.of(0, 1)))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1))).thenReturn(new PageImpl<>(Collections.emptyList()));
+		when(companyRepository.findAll(pageRequest1_1.get())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).verifyComplete();
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).verifyComplete();
 	}
 	
 	@Test
 	public void testFindAllPageableTwoPagesTwoOneTwoOne() {
 		Company company1 = new Company(1L, "Test Company 1");
 		Company company2 = new Company(2L, "Test Company 2");
-		when(companyRepository.findAll(PageRequest.of(0, 1)))
+		Optional<Pageable> pageRequest0_1 = Optional.of(PageRequest.of(0, 1));
+		Optional<Pageable> pageRequest1_1 = Optional.of(PageRequest.of(1, 1));
+		Optional<Sort> sort = Optional.empty();
+		when(companyRepository.findAll(pageRequest0_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company1)));
-		when(companyRepository.findAll(PageRequest.of(1, 1)))
+		when(companyRepository.findAll(pageRequest1_1.get()))
 				.thenReturn(new PageImpl<>(Collections.singletonList(company2)));
 
-		StepVerifier.create(companyService.findAll(PageRequest.of(0, 1))).expectNextMatches(c -> c.getId().equals(1L))
+		StepVerifier.create(companyService.findAll(pageRequest0_1, sort)).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
-		StepVerifier.create(companyService.findAll(PageRequest.of(1, 1))).expectNextMatches(c -> c.getId().equals(2L))
+		StepVerifier.create(companyService.findAll(pageRequest1_1, sort)).expectNextMatches(c -> c.getId().equals(2L))
 				.verifyComplete();
 	}
 }

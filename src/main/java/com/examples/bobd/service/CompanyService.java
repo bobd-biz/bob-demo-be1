@@ -1,6 +1,9 @@
 package com.examples.bobd.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.examples.bobd.model.Company;
@@ -27,8 +30,13 @@ public class CompanyService {
 		return Flux.fromIterable(repo.findAll());
 	}
 	
-	public Flux<Company> findAll(Pageable pageable) {
-		return Flux.fromIterable(repo.findAll(pageable));
+	public Flux<Company> findAll(Optional<Pageable> pageable, Optional<Sort> sort) {
+			
+			return pageable.isPresent() ? 
+					Flux.fromIterable(repo.findAll(pageable.get())) :
+					sort.isPresent() ? 
+							Flux.fromIterable(repo.findAll(sort.get())) : 
+							Flux.fromIterable(repo.findAll());
 	}
 
 	public Mono<Company> save(Company company){
@@ -51,5 +59,12 @@ public class CompanyService {
 	
 	public Mono<Company> findByName(String name) {
 		return Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name));
+	}
+	
+	public Mono<Company> findByName(String name, Optional<Sort> sort) {
+		
+		return sort.isPresent() ? 
+						Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name, sort.get())) : 
+						Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name));
 	}
 }

@@ -2,8 +2,6 @@ package com.examples.bobd.routes;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
-import java.util.function.Predicate;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -32,13 +30,13 @@ public class CustomerRoutes {
 		    			log.info("Customers {} {}", request.method(), request.path());
 		    			return request;
 		    		})
-			        .GET(ID, handler::getById)
-			        .GET(firstNameParam( t -> true)
-			                .and(lastNameParam( t -> true)), handler::findByFirstNameOrLastName)
-			        .GET(firstNameParam( t -> true), handler::findByFirstName)
-			        .GET(lastNameParam( t -> true), handler::findByLastName)
-			        .GET(companyNameParam( t -> true), handler::findByCompanyName)
-			        .GET( handler::findAll)
+			        .GET(ID, accept(MediaType.APPLICATION_JSON), handler::getById)
+			        .GET(firstNameParam()
+			                .and(lastNameParam()), handler::findByFirstNameOrLastName)
+			        .GET(firstNameParam(), handler::findByFirstName)
+			        .GET(lastNameParam(), handler::findByLastName)
+			        .GET(companyNameParam(), handler::findByCompanyName)
+			        .GET(accept(MediaType.APPLICATION_JSON), handler::findAll)
 			        
 			        .POST(accept(MediaType.APPLICATION_JSON), handler::create)
 			        .PUT(accept(MediaType.APPLICATION_JSON), handler::update)
@@ -46,15 +44,15 @@ public class CustomerRoutes {
 			    .build();
   }
   
-	private RequestPredicate firstNameParam(Predicate<String> predicate) {
-	    return RequestPredicates.queryParam(CustomerHandler.FIRST_NAME, predicate);
+	private RequestPredicate firstNameParam() {
+	    return RequestPredicates.queryParam(CustomerHandler.FIRST_NAME, t -> true).and(accept(MediaType.APPLICATION_JSON));
 	}
 	
-	private RequestPredicate lastNameParam(Predicate<String> predicate) {
-		return RequestPredicates.queryParam(CustomerHandler.LAST_NAME, predicate);
+	private RequestPredicate lastNameParam() {
+		return RequestPredicates.queryParam(CustomerHandler.LAST_NAME, t -> true).and(accept(MediaType.APPLICATION_JSON));
 	}
 	
-	private RequestPredicate companyNameParam(Predicate<String> predicate) {
-		return RequestPredicates.queryParam(CustomerHandler.COMPANY_NAME, predicate);
+	private RequestPredicate companyNameParam() {
+		return RequestPredicates.queryParam(CustomerHandler.COMPANY_NAME, t -> true).and(accept(MediaType.APPLICATION_JSON));
 	}
 }

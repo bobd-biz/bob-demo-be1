@@ -1,6 +1,9 @@
 package com.examples.bobd.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.examples.bobd.model.Customer;
@@ -29,8 +32,13 @@ public class CustomerService {
 		return Flux.fromIterable(repo.findAll());
 	}
 	
-	public Flux<Customer> findAll(Pageable pageable) {
-		return Flux.fromIterable(repo.findAll(pageable));
+	public Flux<Customer> findAll(Optional<Pageable> pageable, Optional<Sort> sort) {
+		
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findAll(pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findAll(sort.get())) : 
+						Flux.fromIterable(repo.findAll());
 	}
 
     public Mono<Customer> save(Customer customer){
@@ -71,7 +79,43 @@ public class CustomerService {
 		return Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName));
 	}
 
-	public Flux<Customer> findByCompanyName(String pathVariable) {
-		return Flux.fromIterable(repo.findByCompanyNameIgnoreCase(pathVariable));
+	public Flux<Customer> findByCompanyName(String companyName) {
+		return Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName));
+	}
+	
+	public Flux<Customer> findByFirstName(String firstName, Optional<Pageable> pageable, Optional<Sort> sort) {
+		
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName, pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName, sort.get())) : 
+						Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName));
+	}
+	
+	public Flux<Customer> findByLastName(String lastName, Optional<Pageable> pageable, Optional<Sort> sort) {
+		
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName, pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName, sort.get())) : 
+						Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName));
+	}
+	
+	public Flux<Customer> findByName(String firstName, String lastName, Optional<Pageable> pageable, Optional<Sort> sort) {
+		
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName, pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName, sort.get())) : 
+						Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName));
+	}
+
+	public Flux<Customer> findByCompanyName(String companyName, Optional<Pageable> pageable, Optional<Sort> sort) {
+		
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName, pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName, sort.get())) : 
+						Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName));
 	}
 }
