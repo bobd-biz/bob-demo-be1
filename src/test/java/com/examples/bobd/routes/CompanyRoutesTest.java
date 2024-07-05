@@ -1,8 +1,7 @@
 package com.examples.bobd.routes;
 
-import com.examples.bobd.model.Company;
-import com.examples.bobd.service.CompanyHandler;
-import com.examples.bobd.service.CompanyService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,10 +10,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import com.examples.bobd.model.Company;
+import com.examples.bobd.service.CompanyHandler;
+import com.examples.bobd.service.CompanyService;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static org.mockito.Mockito.when;
 
 public class CompanyRoutesTest {
 
@@ -40,6 +42,7 @@ public class CompanyRoutesTest {
         Company company1 = new Company(1L, "Company 1");
         Company company2 = new Company(2L, "Company 2");
         when(companyService.findAll()).thenReturn(Flux.just(company1, company2));
+        when(companyService.findAll(any(), any())).thenReturn(Flux.just(company1, company2));
 
         webTestClient.get().uri("/companies")
                 .accept(MediaType.APPLICATION_JSON)

@@ -1,7 +1,11 @@
 package com.examples.bobd.service;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -25,12 +29,19 @@ public class CustomerHandler {
 	public static final String FIRST_NAME = "first";
 	public static final String LAST_NAME = "last";
 	
+	private static final Set<String> ACCEPTED_FIELDS = Set.of(COMPANY_NAME, FIRST_NAME, LAST_NAME);
+	
 	private final CustomerService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
+		log.info("findAll request={}", request);
+		Optional<Pageable> pageable = Extractors.extractPageable(request);
+		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		log.info("pageable={}, sort={}", pageable, sort);
+		
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromProducer(service.findAll(), Customer.class));
+				.body(BodyInserters.fromProducer(service.findAll(pageable, sort), Customer.class));
 	}
 	
 	public Mono<ServerResponse> getById(ServerRequest request) {

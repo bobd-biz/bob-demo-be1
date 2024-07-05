@@ -32,11 +32,11 @@ public class CompanyService {
 	
 	public Flux<Company> findAll(Optional<Pageable> pageable, Optional<Sort> sort) {
 			
-			return pageable.isPresent() ? 
-					Flux.fromIterable(repo.findAll(pageable.get())) :
-					sort.isPresent() ? 
-							Flux.fromIterable(repo.findAll(sort.get())) : 
-							Flux.fromIterable(repo.findAll());
+		return pageable.isPresent() ? 
+				Flux.fromIterable(repo.findAll(pageable.get())) :
+				sort.isPresent() ? 
+						Flux.fromIterable(repo.findAll(sort.get())) : 
+						Flux.fromIterable(repo.findAll());
 	}
 
 	public Mono<Company> save(Company company){

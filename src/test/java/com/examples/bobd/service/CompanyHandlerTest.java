@@ -1,6 +1,7 @@
 
 package com.examples.bobd.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,7 @@ public class CompanyHandlerTest {
         Company company1 = new Company(1L, "Test Company 1");
         Company company2 = new Company(2L, "Test Company 2");
         when(companyService.findAll()).thenReturn(Flux.just(company1, company2));
+        when(companyService.findAll(any(), any())).thenReturn(Flux.just(company1, company2));
 
         webTestClient.get().uri("/companies")
                 .accept(MediaType.APPLICATION_JSON)

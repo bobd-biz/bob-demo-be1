@@ -1,5 +1,6 @@
 package com.examples.bobd.routes;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ public class CustomerRoutesTest {
         Customer customer1 = new Customer("test1", "First1", "Last1", "Test Company 1");
         Customer customer2 = new Customer("test2", "First2", "Last2", "Test Company 2");
         when(customerService.findAll()).thenReturn(Flux.just(customer1, customer2));
+        when(customerService.findAll(any(), any())).thenReturn(Flux.just(customer1, customer2));
 
         webTestClient.get().uri(PREFIX)
                 .accept(MediaType.APPLICATION_JSON)
