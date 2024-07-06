@@ -1,0 +1,56 @@
+Please create a Java program that reads two files and combines them. The first file is called names and each line contains a 
+first and last name, separated by a space. The second file contains a list of company names, one per line. For each line 
+in the names file, select a company name at random, and then output the first name, last name, and random company name to 
+a file, one combination per line.
+
+
+Copilot4Eclipse
+
+
+Here is a Java program that accomplishes this task. This program uses BufferedReader to read the files and PrintWriter to write to the output file. It also uses ArrayList to store the names and companies, and Random to select a random company for each name.
+
+
+import java.io.*;
+import java.util.*;
+
+public class CombineFiles {
+    public static void main(String[] args) {
+        List<String> names = new ArrayList<>();
+        List<String> companies = new ArrayList<>();
+        Random random = new Random();
+
+        // Read names from file
+        try (BufferedReader reader = new BufferedReader(new FileReader("names.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                names.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Read companies from file
+        try (BufferedReader reader = new BufferedReader(new FileReader("companies.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                companies.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Write names and random company to output file
+        try (PrintWriter writer = new PrintWriter(new FileWriter("output.txt"))) {
+            for (String name : names) {
+                String company = companies.get(random.nextInt(companies.size()));
+                writer.println(name + " " + company);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+This program assumes that the files "names.txt" and "companies.txt" are in the same directory as the Java program. The output 
+will be written to "output.txt" in the same directory. If the files are in different locations, you should replace the file 
+names with the correct paths.
