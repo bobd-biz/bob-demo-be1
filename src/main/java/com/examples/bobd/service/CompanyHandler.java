@@ -1,7 +1,7 @@
 package com.examples.bobd.service;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,14 +23,14 @@ import reactor.core.publisher.Mono;
 public class CompanyHandler {
 
 	private static final String COMPANY_NAME = "name";
-	private static final Set<String> ACCEPTED_FIELDS = Set.of(COMPANY_NAME);
+	private static final Map<String, String> COMPANY_FIELDS = Map.of(COMPANY_NAME, "companyName");
 	
 	private final CompanyService service;
 	
 	public Mono<ServerResponse> findAll(ServerRequest request) {
 		log.info("findAll request={}", request);
 		Optional<Pageable> pageable = Extractors.extractPageable(request);
-		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		Optional<Sort> sort = Extractors.extractSort(request, COMPANY_FIELDS);
 		log.info("pageable={}, sort={}", pageable, sort);
 		
 		var response = ServerResponse.ok()

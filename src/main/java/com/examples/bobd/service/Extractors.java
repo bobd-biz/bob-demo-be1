@@ -1,13 +1,16 @@
 package com.examples.bobd.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Extractors {
 	
 	private static final String SORT_BY = "sort";
@@ -41,9 +44,9 @@ public class Extractors {
 		return Optional.empty();
 	}
 	
-	public static Optional<Sort> extractSort(ServerRequest request, Set<String> validFields) {
+	public static Optional<Sort> extractSort(ServerRequest request, Map<String, String> validFields) {
 		Optional<List<String>> sort = extractStringsParam(request, SORT_BY);
-		System.out.println("sort: " + sort);
+		log.info("sort={} valid={}", sort, validFields);
 		
 		List<Sort.Order> orders = sort.stream()
 				.flatMap(List::stream)
@@ -53,16 +56,22 @@ public class Extractors {
 		return !orders.isEmpty() ? Optional.of(Sort.by(orders)) : Optional.empty();
 	}
 	
-	public static Sort.Order createSortOrder(String fieldSpec, Set<String> validFields) {
+	public static Sort.Order createSortOrder(String fieldSpec, Map<String, String> validFields) {
 		String[] parts = fieldSpec.split(":");
-		if (!validFields.contains(parts[0])) {
+		log.info("parts={}", List.of(parts));
+		log.info("lower={}", parts[0].toLowerCase());
+		if (!validFields.containsKey(parts[0].toLowerCase())) {
 			throw new IllegalArgumentException("Invalid sort field: " + parts[0]);
 		}
 		return parts.length == 3 ? 
-				new Sort.Order(sortDirection(parts[1]), parts[0], isIgnoreCase(parts[2]), Sort.NullHandling.NATIVE) :	
+				new Sort.Order(sortDirection(parts[1]), toExternal(parts[0], validFields), isIgnoreCase(parts[2]), Sort.NullHandling.NATIVE) :	
 				parts.length == 2 ?
-						new Sort.Order(sortDirection(parts[1]), parts[0]) :
-						new Sort.Order(Sort.Direction.ASC, parts[0]);
+						new Sort.Order(sortDirection(parts[1]), toExternal(parts[0], validFields)) :
+						new Sort.Order(Sort.Direction.ASC, toExternal(parts[0], validFields));
+	}
+	
+	private static String toExternal(String key, Map<String, String> validFields) {
+		return validFields.get(key.toLowerCase());
 	}
 	
 	private static Sort.Direction sortDirection(String dir) {

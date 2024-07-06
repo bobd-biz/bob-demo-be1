@@ -47,7 +47,6 @@ public class CustomerHandlerTest {
     @Test
     public void testCustomerExtractionFromBody() throws JsonProcessingException {
         Customer customer = new Customer("test1", "First1", "Last1", "Test Company 1");
-        String customerString = mapper.writeValueAsString(customer);
         when(customerService.save(null)).thenReturn(Mono.just(customer));
         
         var s = 

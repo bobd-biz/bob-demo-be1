@@ -52,6 +52,20 @@ public class CompanyRoutesTest {
     }
 
     @Test
+    public void testFindAllCompanies_sort_name() {
+        Company company1 = new Company(1L, "Company 1");
+        Company company2 = new Company(2L, "Company 2");
+        when(companyService.findAll()).thenReturn(Flux.just(company1, company2));
+        when(companyService.findAll(any(), any())).thenReturn(Flux.just(company1, company2));
+
+        webTestClient.get().uri("/companies")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(Company.class);
+    }
+
+    @Test
 	public void testGetCompanyById() {
 		Company company = new Company(1L, "Company 1");
 		when(companyService.findById(1L)).thenReturn(Mono.just(company));

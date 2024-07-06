@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +22,13 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 public class ExtractorsTest {
 
     private ServerRequest serverRequest;
+    private static final Map<String, String> validFields = Map.of("field1", "field1", "field2", "field2");
 
     @BeforeEach
     public void setup() {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("key", "value");
-        queryParams.add("sort", "field1");
+        queryParams.add("sort", "Field1");
         queryParams.add("sort", "field2");
         queryParams.add("size", "10");
         queryParams.add("page", "1");
@@ -52,7 +53,7 @@ public class ExtractorsTest {
 
     @Test
     public void testExtractStringsParam() {
-        var expected = List.of("field1", "field2");
+        var expected = List.of("Field1", "field2");
         var actual =  Extractors.extractStringsParam(serverRequest, "sort").orElse(null);
         assertEquals(expected, actual);
     }
@@ -66,12 +67,13 @@ public class ExtractorsTest {
     @Test
     public void testExtractSort() {
         Sort expectedSort = Sort.by(Sort.Direction.ASC, "field1", "field2");
-        assertEquals(expectedSort, Extractors.extractSort(serverRequest, Set.of("field1", "field2")).orElse(null));
+        assertEquals(expectedSort, Extractors.extractSort(serverRequest, validFields).orElse(null));
     }
 
     @Test
     public void testExtractSort_unknown_sort_field() {
-        assertThrows(IllegalArgumentException.class, () -> Extractors.extractSort(serverRequest, Set.of("field1")).orElse(null));
+        Map<String, String> otherFields = Map.of("foo", "bar", "george", "mary");
+    	assertThrows(IllegalArgumentException.class, () -> Extractors.extractSort(serverRequest, otherFields));
     }
 
     @Test
@@ -81,8 +83,20 @@ public class ExtractorsTest {
 
         serverRequest = MockServerRequest.builder().queryParams(queryParams).build();
         
-        assertTrue(Extractors.extractSort(serverRequest, Set.of("bogus")).isEmpty(), "Unfound fields should be ignored");
+        assertTrue(Extractors.extractSort(serverRequest, Map.of("bogus", "foobar")).isEmpty(), "Unfound fields should be ignored");
     }
+    
+    @Test
+	public void testExtractSort_ignore_parameter_case() {
+		MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+		queryParams.add("sort", "CAPS");
+
+		serverRequest = MockServerRequest.builder().queryParams(queryParams).build();
+
+        Sort expectedSort = Sort.by(Sort.Direction.ASC, "foobar");
+		assertEquals(expectedSort, Extractors.extractSort(serverRequest, Map.of("caps", "foobar")).orElse(null),
+				"Parameter case should be ignored");
+	}
     
     @Test
     public void testExtractSort_sort_variations() {
@@ -94,7 +108,8 @@ public class ExtractorsTest {
         queryParams.add("sort", "field5:desc:somethingelse");
         
         serverRequest = MockServerRequest.builder().queryParams(queryParams).build();
-        Sort info = Extractors.extractSort(serverRequest, Set.of("field1", "field2", "field3", "field4", "field5")).get();
+        var mockValidFields = Map.of("field1", "field1", "field2", "field2", "field3", "field3", "field4", "field4", "field5", "field5");
+        Sort info = Extractors.extractSort(serverRequest, mockValidFields).get();
         
         assertAll(
         		() -> assertEquals(new Sort.Order(Sort.Direction.ASC, "field1"), info.getOrderFor("field1")),

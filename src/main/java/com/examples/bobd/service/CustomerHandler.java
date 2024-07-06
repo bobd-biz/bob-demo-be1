@@ -1,7 +1,7 @@
 package com.examples.bobd.service;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,8 @@ public class CustomerHandler {
 	public static final String FIRST_NAME = "first";
 	public static final String LAST_NAME = "last";
 	
-	private static final Set<String> ACCEPTED_FIELDS = Set.of(COMPANY_NAME, FIRST_NAME, LAST_NAME);
+	private static final Map<String, String> ACCEPTED_FIELDS = 
+			Map.of(COMPANY_NAME, "companyName", FIRST_NAME, "firstName", LAST_NAME, "lastName");
 	
 	private final CustomerService service;
 	

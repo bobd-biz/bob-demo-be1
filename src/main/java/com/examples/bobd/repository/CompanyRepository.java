@@ -2,7 +2,6 @@ package com.examples.bobd.repository;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListCrudRepository;
@@ -16,6 +15,7 @@ public interface CompanyRepository extends ListCrudRepository<Company, Long>,
 	Optional<Company> findByCompanyNameIgnoreCase(String companyName);
 	Optional<Company> findByCompanyNameIgnoreCase(String companyName, Sort sort);
 
+// Inherited:
 //	List<T> findAll(Sort sort);
 //	Iterable<T> findAll(Sort sort);
 //	Page<T> findAll(Pageable pageable);
