@@ -1,9 +1,9 @@
-# newrelic1
+# bob-demo-be1
 
 
 ## Description
 
-New Relic demo project.
+Java backend demo project using Spring Boot, WebFlux, etc.
 
 ## Requirements and Basic Configuration
 
@@ -14,11 +14,11 @@ New Relic demo project.
 * Git
 
 Currently the project is configured for MySQL (port 3306) but can be easily changed.
-* Database: newrelic
-* Username: newrelic
-* Password: newrelic 
+* Database: bob-demo-1
+* Username: bob-demo-1
+* Password: bob-demo-1 
 
-The web service is configured for port 3000.
+The web service is configured for port 4000 by default.
 
 ## Setup
 
@@ -26,8 +26,8 @@ The project is hosted on GitHub and is built using Gradle. To checkout and build
 
 
 ```
-git clone https://github.com/bobd-biz/newrelic1.git 
-cd newrelic1 
+git clone https://github.com/bobd-biz/bob-demo-be1.git 
+cd bob-demo-be1 
 ./gradlew build
 ```
 
@@ -42,7 +42,7 @@ To run the unit tests:
 ```
 ./gradlew test
 ```
-To start serving the microservices (configured on port 3000):
+To start serving the microservices (configured on port 4000):
 ```
 ./gradlew bootRun
 ```
