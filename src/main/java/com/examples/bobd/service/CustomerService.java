@@ -68,54 +68,54 @@ public class CustomerService {
 	}
 	
 	public Flux<Customer> findByFirstName(String firstName) {
-		return Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName));
+		return Flux.fromIterable(repo.findByFirstNameIgnoreCaseContains(firstName));
 	}
 	
 	public Flux<Customer> findByLastName(String lastName) {
-		return Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName));
+		return Flux.fromIterable(repo.findByLastNameIgnoreCaseContains(lastName));
 	}
 	
 	public Flux<Customer> findByName(String firstName, String lastName) {
-		return Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName));
+		return Flux.fromIterable(repo.findByAllIgnoreCaseFirstNameContainsOrLastNameContains(firstName, lastName));
 	}
 
 	public Flux<Customer> findByCompanyName(String companyName) {
-		return Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName));
+		return Flux.fromIterable(repo.findByCompanyNameIgnoreCaseContains(companyName));
 	}
 	
 	public Flux<Customer> findByFirstName(String firstName, Optional<Pageable> pageable, Optional<Sort> sort) {
 		
 		return pageable.isPresent() ? 
-				Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName, pageable.get())) :
+				Flux.fromIterable(repo.findByFirstNameIgnoreCaseContains(firstName, pageable.get())) :
 				sort.isPresent() ? 
-						Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName, sort.get())) : 
-						Flux.fromIterable(repo.findByFirstNameIgnoreCase(firstName));
+						Flux.fromIterable(repo.findByFirstNameIgnoreCaseContains(firstName, sort.get())) : 
+						Flux.fromIterable(repo.findByFirstNameIgnoreCaseContains(firstName));
 	}
 	
 	public Flux<Customer> findByLastName(String lastName, Optional<Pageable> pageable, Optional<Sort> sort) {
 		
 		return pageable.isPresent() ? 
-				Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName, pageable.get())) :
+				Flux.fromIterable(repo.findByLastNameIgnoreCaseContains(lastName, pageable.get())) :
 				sort.isPresent() ? 
-						Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName, sort.get())) : 
-						Flux.fromIterable(repo.findByLastNameIgnoreCase(lastName));
+						Flux.fromIterable(repo.findByLastNameIgnoreCaseContains(lastName, sort.get())) : 
+						Flux.fromIterable(repo.findByLastNameIgnoreCaseContains(lastName));
 	}
 	
 	public Flux<Customer> findByName(String firstName, String lastName, Optional<Pageable> pageable, Optional<Sort> sort) {
 		
 		return pageable.isPresent() ? 
-				Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName, pageable.get())) :
+				Flux.fromIterable(repo.findByAllIgnoreCaseFirstNameContainsOrLastNameContains(firstName, lastName, pageable.get())) :
 				sort.isPresent() ? 
-						Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName, sort.get())) : 
-						Flux.fromIterable(repo.findByFirstNameOrLastNameIgnoreCase(firstName, lastName));
+						Flux.fromIterable(repo.findByAllIgnoreCaseFirstNameContainsOrLastNameContains(firstName, lastName, sort.get())) : 
+						Flux.fromIterable(repo.findByAllIgnoreCaseFirstNameContainsOrLastNameContains(firstName, lastName));
 	}
 
 	public Flux<Customer> findByCompanyName(String companyName, Optional<Pageable> pageable, Optional<Sort> sort) {
 		
 		return pageable.isPresent() ? 
-				Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName, pageable.get())) :
+				Flux.fromIterable(repo.findByCompanyNameIgnoreCaseContains(companyName, pageable.get())) :
 				sort.isPresent() ? 
-						Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName, sort.get())) : 
-						Flux.fromIterable(repo.findByCompanyNameIgnoreCase(companyName));
+						Flux.fromIterable(repo.findByCompanyNameIgnoreCaseContains(companyName, sort.get())) : 
+						Flux.fromIterable(repo.findByCompanyNameIgnoreCaseContains(companyName));
 	}
 }

@@ -73,11 +73,13 @@ public class CompanyHandler {
 	
 	public Mono<ServerResponse> findByName(ServerRequest request) {
 		log.info("findByName request={}", request);
+		Optional<Sort> sort = Extractors.extractSort(request, COMPANY_FIELDS);
+		log.info("sort={}", sort);
+		
 		String name = request.queryParam(COMPANY_NAME).orElseThrow(() -> new RuntimeException("Company name is required"));
-		return service.findByName(name)
-				.flatMap(customer -> ServerResponse.ok()
-		                .contentType(MediaType.APPLICATION_JSON)
-		                .bodyValue(customer))
-		        .switchIfEmpty(Responses.badRequest("Company not found"));
+		var response = ServerResponse.ok()
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromProducer(service.findByName(name, sort), Company.class));
+		return response;
 	}
 }

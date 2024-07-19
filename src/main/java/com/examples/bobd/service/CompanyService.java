@@ -57,14 +57,14 @@ public class CompanyService {
 		repo.deleteById(id);
 	}
 	
-	public Mono<Company> findByName(String name) {
-		return Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name));
+	public Flux<Company> findByName(String name) {
+		return Flux.fromIterable(repo.findByCompanyNameContainsIgnoreCase(name));
 	}
 	
-	public Mono<Company> findByName(String name, Optional<Sort> sort) {
+	public Flux<Company> findByName(String name, Optional<Sort> sort) {
 		
 		return sort.isPresent() ? 
-						Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name, sort.get())) : 
-						Mono.justOrEmpty(repo.findByCompanyNameIgnoreCase(name));
+					Flux.fromIterable(repo.findByCompanyNameContainsIgnoreCase(name, sort.get())) : 
+					Flux.fromIterable(repo.findByCompanyNameContainsIgnoreCase(name));
 	}
 }

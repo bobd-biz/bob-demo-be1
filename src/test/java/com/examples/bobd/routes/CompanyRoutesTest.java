@@ -3,6 +3,8 @@ package com.examples.bobd.routes;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -80,18 +82,19 @@ public class CompanyRoutesTest {
     @Test
 	public void testGetCompanyByName() {
 		Company company = new Company(1L, "Company 1");
-		when(companyService.findByName("Company 1")).thenReturn(Mono.just(company));
+		when(companyService.findByName("Company 1")).thenReturn(Flux.just(company));
+		when(companyService.findByName("Company 1", Optional.empty())).thenReturn(Flux.just(company));
 
 		webTestClient.get().uri("/companies?name=Company 1")
 			.accept(MediaType.APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk()
-			.expectBody(Company.class);
+			.expectBodyList(Company.class).hasSize(1).contains(company);
 	}
     
     @Test
     public void testCreateCompany() {
-    	        Company company = new Company(1L, "Company 1");
+        Company company = new Company(1L, "Company 1");
         when(companyService.save(company)).thenReturn(Mono.just(company));
 
         webTestClient.post().uri("/companies")

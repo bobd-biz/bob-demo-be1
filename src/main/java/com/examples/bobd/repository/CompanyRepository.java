@@ -1,6 +1,6 @@
 package com.examples.bobd.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
@@ -12,8 +12,8 @@ import com.examples.bobd.model.Company;
 public interface CompanyRepository extends ListCrudRepository<Company, Long>, 
 				CrudRepository<Company, Long>, PagingAndSortingRepository<Company, Long> {
 
-	Optional<Company> findByCompanyNameIgnoreCase(String companyName);
-	Optional<Company> findByCompanyNameIgnoreCase(String companyName, Sort sort);
+	List<Company> findByCompanyNameContainsIgnoreCase(String companyName);
+	List<Company> findByCompanyNameContainsIgnoreCase(String companyName, Sort sort);
 
 // Inherited:
 //	List<T> findAll(Sort sort);

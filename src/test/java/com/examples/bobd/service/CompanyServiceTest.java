@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -99,7 +100,7 @@ public class CompanyServiceTest {
 	@Test
 	public void testFindByName() {
 		Company company = new Company(1L, "Test Company 1");
-		when(companyRepository.findByCompanyNameIgnoreCase("Test Company 1")).thenReturn(Optional.of(company));
+		when(companyRepository.findByCompanyNameContainsIgnoreCase("Test Company 1")).thenReturn(List.of(company));
 
 		StepVerifier.create(companyService.findByName("Test Company 1")).expectNextMatches(c -> c.getId().equals(1L))
 				.verifyComplete();
@@ -107,7 +108,7 @@ public class CompanyServiceTest {
 	
 	@Test
 	public void testFindByNameNotFound() {
-		when(companyRepository.findByCompanyNameIgnoreCase("Nonexistent")).thenReturn(Optional.empty());
+		when(companyRepository.findByCompanyNameContainsIgnoreCase("Nonexistent")).thenReturn(List.of());
 
 		StepVerifier.create(companyService.findByName("Nonexistent")).verifyComplete();
 	}
