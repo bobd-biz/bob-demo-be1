@@ -47,23 +47,20 @@ To start serving the microservices (configured on port 4000):
 ./gradlew bootRun
 ```
 
-## Design Considerations and Shortcomings
+## Design Considerations
 
 * Services accept and return JSON.
-* To keep things simpler, authentication and authorization are not configured, so no HTTPS or OpenId/OAuth2.
+* To keep things simpler at least initially, authentication and authorization are not configured, so no HTTPS or OpenId/OAuth2.
 * The two different services (companies and customers) are packaged together for convenience.
 * Spring Webflux is used to implement the REST services in an attempt to provide asynchronous performance. However, no testing or analysis has been done to verify the services actually operate without blocking.
-* Error handling is by no means complete. For instance, if a resource is not found the service returns a 404 status code, but no detailed error details.
 * Lombok is used to create class scaffolding such as getters.
 * Flyway is used to manage database schema changes.
 * Some Spring libraries, such as validator and actuator, are included in the configuration but not yet exploited.
-* Create services return a 201 status but do not provide a URI for the created object.
-* The Customer object currently has a String Id. This is actually intended to be a UUID to make creation across services more robust.
-* Although JPA is used, no work has been done with transactions (which aren't likely to be needed anyway for these services).
+* The Customer object has a String Id that the database uses for a UUID. This is intended to make creation across service instances more robust.
 * Spring Routes are used for service dispatch. Some of the services are only differentiated using query parameters, making the routing predicates a little clumsy. There may be a better approach.
-* The API is not versioned. In any event my preference is use headers instead of including version in the path.
+* The APIs are not versioned. In any event my preference is use headers instead of including version in the path.
 * Used Copilot to generate initial unit tests and suggest code patterns.
-* The overall approach to class definition takes a functional approach. Classes are idempotent - there are no setters.
+* The overall approach to class definition takes a functional approach. Classes are idempotent - there are no setters. This begs the question as to whether Java Records should have been used. There appeared to some potential issues with JPA, but that may be due to Records being unfamiliar.
 * Given the simple data structures, DAO/DTO classes and Mapstruct were not used.
 * A foreign key could be used for the many-one relationship from the customers table to the companies table. For now a NoSQL approach was used, just embedding the company name in the customers table.
 * With Webflux the class relationships are slightly different than traditional Spring projects. 
@@ -71,6 +68,12 @@ To start serving the microservices (configured on port 4000):
     * *Services* isolate business operations from the database implementation. This should make those operations easier to test. In addition, service operations use the reactive Mono/Flux model, although in the current implementation the database operations block. This might allow long duration operations to be chunked so that individual chunks block for a shorter time.
     * *Handlers* both package operations that mirror the API as well as dealing with translation to and from the external representation. For instance, the handlers extract parameters from the server request and return status codes.
     * *Routes* map the external URL requests into handler requests. The intent is to isolate all the server request and response operations into this layer (although not fully accomplished so far).
-* Error handling is rudimentary at best. JSON format errors (converting a JSON string to an internal object like Customer), incorrect parameters and not found (404) errors return a simple JSON error message.
-* CORS requests are allowed from http://localhost:3000 for GET, PUT, POST, DELETE, HEAD. This is not currently configurable so any change requires a simple code modification.
 
+## Current Shortcomings
+
+* Error handling is by no means complete. For instance, if a resource is not found the service returns a 404 status code, but no detailed error details.
+* Create services return a 201 status but do not return a URI for the created object.
+* Although JPA is used, no work has been done with transactions (which aren't likely to be needed anyway for these services).
+* Error handling is rudimentary at best. JSON format errors (converting a JSON string to an internal object like Customer), incorrect parameters and not found (404) errors return a simple JSON error message.
+* CORS requests are allowed from http://localhost:3000 for GET, PUT, POST, DELETE, HEAD. The intent is to allow the frontend to be packaged on the same host. It's not currently configurable so any change requires a simple code modification.
+* The tests are not comprehensive, nor has coverage or performance been checked. The initial intent was to create tests for the highest ROI.
