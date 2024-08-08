@@ -63,6 +63,7 @@ public class Extractors {
 	 * @return an Optional containing the parameter values if present
 	 */
 	public static Optional<List<String>> extractStringsParam(ServerRequest request, String key) {
+		log.info("extractStringsParam {}={}", key, request.queryParam(key));
 		return Optional.ofNullable(request.queryParams().get(key));
 	}
 
@@ -89,6 +90,8 @@ public class Extractors {
 	 * @return an Optional containing the sort object if present
 	 */
 	public static Optional<Sort> extractSort(ServerRequest request, Map<String, String> validFields) {
+		log.info("extractSort {}", request.path());
+		request.queryParams().forEach((k, v) -> log.info("queryParam: {}={}", k, v));
 		Optional<List<String>> sort = extractStringsParam(request, SORT_BY);
 		log.info("sort={} valid={}", sort, validFields);
 
