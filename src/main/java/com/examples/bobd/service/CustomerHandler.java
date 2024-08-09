@@ -91,30 +91,46 @@ public class CustomerHandler {
 	
 	public Mono<ServerResponse> findByCompanyName(ServerRequest request) {
 		String name = request.queryParam(COMPANY_NAME).orElseThrow(() -> new RuntimeException("Company name is required"));
+		Optional<Pageable> pageable = Extractors.extractPageable(request);
+		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		log.info("pageable={}, sort={}", pageable, sort);
+		
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromProducer(service.findByCompanyName(name), Customer.class));
+				.body(BodyInserters.fromProducer(service.findByCompanyName(name, pageable, sort), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByFirstName(ServerRequest request) {
 		String name = request.queryParam(FIRST_NAME).orElseThrow(() -> new RuntimeException("First name is required"));
+		Optional<Pageable> pageable = Extractors.extractPageable(request);
+		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		log.info("pageable={}, sort={}", pageable, sort);
+		
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromProducer(service.findByFirstName(name), Customer.class));
+				.body(BodyInserters.fromProducer(service.findByFirstName(name, pageable, sort), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByLastName(ServerRequest request) {
 		String name = request.queryParam(LAST_NAME).orElseThrow(() -> new RuntimeException("Last name is required"));
+		Optional<Pageable> pageable = Extractors.extractPageable(request);
+		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		log.info("pageable={}, sort={}", pageable, sort);
+		
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromProducer(service.findByLastName(name), Customer.class));
+				.body(BodyInserters.fromProducer(service.findByLastName(name, pageable, sort), Customer.class));
 	}
 	
 	public Mono<ServerResponse> findByFirstNameOrLastName(ServerRequest request) {
 		String firstName = request.queryParam(FIRST_NAME).orElseThrow(() -> new RuntimeException("First name is required"));
 		String lastName = request.queryParam(LAST_NAME).orElseThrow(() -> new RuntimeException("Last name is required"));
+		Optional<Pageable> pageable = Extractors.extractPageable(request);
+		Optional<Sort> sort = Extractors.extractSort(request, ACCEPTED_FIELDS);
+		log.info("pageable={}, sort={}", pageable, sort);
+		
 		return ServerResponse.ok()
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(BodyInserters.fromProducer(service.findByName(firstName, lastName), Customer.class));
+				.body(BodyInserters.fromProducer(service.findByName(firstName, lastName, pageable, sort), Customer.class));
 	}
 }
